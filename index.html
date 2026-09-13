@@ -42,8 +42,10 @@
     <section class="section intro simple-section" id="abstract">
       <div class="wrap narrow reveal">
         <h2>Abstract</h2>
-        <div class="abstract-copy"><p>Understanding articulated objects is fundamental for robots to interact with the physical world, requiring accurate segmentation of object parts and their kinematic relations. Existing reconstruction-first approaches can underuse temporal evidence and couple articulation estimation to errors in geometry reconstruction and correspondence.</p>
-        <p>Track2Art is a motion-centric framework that recovers structured articulated object models from RGB-D interaction videos. A pretrained point tracker supplies feature-rich 4D trajectories; a motion-aware slot model groups them into rigid parts; pairwise and rotation-equivariant geometry modules recover the directed kinematic graph, joint types, and joint geometry.</p></div>
+        <div class="abstract-copy"><p>Understanding articulated objects is fundamental for robots to interact with the physical world, which requires accurate segmentation of object parts and their kinematic relations. Motion provides a strong cue for understanding articulated structure: points on the same rigid part exhibit coherent motion, while relative trajectories between parts directly expose their kinematic constraints. However, many existing approaches recover articulation indirectly by first reconstructing object geometry across a small number of articulation states and subsequently inferring motion through cross-state alignment or per-instance optimization. Such reconstruction-first pipelines can underutilize rich temporal evidence and couple articulation estimation to errors in geometry reconstruction and correspondence.</p>
+
+<p>We present Track2Art, a motion-centric framework for recovering structured articulated object models from RGB-D interaction videos. Track2Art leverages a pretrained point tracker to obtain feature-rich 4D point trajectories. A motion-aware slot model groups trajectories into rigid object parts based on tracker appearance embeddings and explicit trajectory geometry. Given the recovered parts, a pairwise relation module predicts the directed kinematic graph and joint types, while a rotation-equivariant geometry module fuses motion-derived directional proposals and performs constrained axis-line refinement to recover joint geometry. Experimental results demonstrate the effectiveness of reasoning directly from persistent point motion for recovering structured articulated object models from dynamic visual observations.</p>
+        </div>
       </div>
     </section>
 
@@ -52,12 +54,12 @@
         <div class="center-heading"><h2>Method</h2><p>Persistent point motion stays intact from observation to articulation reasoning.</p></div>
         <figure class="figure-card">
           <img src="figures/pipeline.webp" alt="Track2Art overview: RGB-D video becomes point trajectories, part discovery, and joint prediction">
-          <figcaption>Track2Art transforms an RGB-D interaction into persistent 4D point trajectories, groups coherent motion into parts, and predicts the kinematic structure and joint geometry.</figcaption>
+          <figcaption>Overview of Track2Art. Track2Art transforms an RGB-D interaction video into persistent 4D point trajectories, whose coherent motion reveals articulated part structure. The recovered parts and their relative motion are then used to infer a structured articulated object model with a directed kinematic graph, joint types, and joint geometry.</figcaption>
         </figure>
         <p class="method-copy">CoTracker establishes persistent 2D correspondences and calibrated depth lifts them into metric 4D trajectories. A motion-aware set predictor groups appearance and trajectory geometry into rigid parts. Pairwise relation and equivariant geometry heads then recover directed joints, types, axes, and pivot points.</p>
         <figure class="figure-card light pipeline-figure">
           <img src="figures/overview.webp" alt="Detailed Track2Art architecture with track tokens, motion-aware part discovery, and joint prediction">
-          <figcaption>Track2Art architecture. Appearance descriptors and explicit trajectory geometry form each track token before part discovery and kinematic reasoning.</figcaption>
+          <figcaption>Track2Art architecture. Given an RGB-D interaction video and an object mask, Track2Art extracts persistent CoTracker trajectories and lifts them into 3D using calibrated depth. Each track token combines a frozen appearance descriptor with an explicit trajectory-geometry encoding. A set-prediction slot model groups the tracks into a variable number of rigid parts, supervised by a weighted-Kabsch motion-consistency objective. For every ordered pair of active part slots, a relation head predicts directed edges and joint types, while an equivariant geometry head combines analytic motion proposals to recover axes and pivot points, followed by a bounded correction.</figcaption>
         </figure>
       </div>
     </section>
