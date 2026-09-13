@@ -2,7 +2,7 @@
   'use strict';
   const P=window.PART_PREDICTION,D=window.PART_SCENE, canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d');
   const detail=document.querySelector('.detail'), slider=document.querySelector('#time'), output=document.querySelector('output');
-  if(!D){detail.textContent='数据加载失败，请重新打开页面。';detail.classList.add('error');return;}
+  if(!D){detail.textContent='Data failed to load. Please reopen the page.';detail.classList.add('error');return;}
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [cx,cy,cw,ch]=D.crop,K=D.intrinsics,C=D.center,N=D.frames.length;
   let W=900,H=520,frame=0,mode=0,morph=0,selection=0,flow=true,playing=false,ready=false,last=0,elapsed=0;
@@ -14,14 +14,14 @@
   surfaces.forEach(c=>{c.width=cw;c.height=ch;});
   const tracks=D.tracks, frames=D.frames;
   slider.max=N-1;
-  function selectionUI(){document.querySelectorAll('[data-part]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.part)===selection));detail.textContent=selection?`${mode===3?P.parts[selection]:D.parts[selection]} · ${flow?'CoTracker 轨迹已显示':'轨迹已隐藏'} · 其他部分已淡化`:(mode===3?`${Object.values(P.parts).join(' / ')} · 黄色：预测轴 · 灰色：未分配`:'点击物体选择部件；RGBD / 4D 中可拖动观察。');}
+  function selectionUI(){document.querySelectorAll('[data-part]').forEach(b=>b.setAttribute('aria-pressed',Number(b.dataset.part)===selection));detail.textContent=selection?`${mode===3?P.parts[selection]:D.parts[selection]} · ${flow?'CoTracker tracks shown':'Tracks hidden'} · Other parts dimmed`:(mode===3?`${Object.values(P.parts).join(' / ')} · Yellow: predicted axis · Gray: unassigned`:'Click the object to select a part. Drag to orbit in RGBD / 4D.');}
   function select(part){selection=part;selectionUI();}
-  function setMode(m){if((mode===3)!==(m===3))selection=0;mode=m;document.querySelectorAll('[data-part]').forEach(b=>{if(+b.dataset.part){const label=m===3?P.parts[b.dataset.part]:D.parts[b.dataset.part];b.hidden=!label;b.textContent=label||'';}});selectionUI();if(reduced)morph=m;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.mode===m));document.querySelector('.tag').textContent=['PRIMARY CAMERA · RGB','DEPTH RECONSTRUCTION · RGBD','TEMPORAL · 4D POINT CLOUD','TRACK2ART · PART SEG + AXIS'][m];document.querySelector('.hint').textContent=m?'左右 / 上下拖动视角 · 点击选择部件':'点击部件，查看 CoTracker 轨迹';document.querySelector('#orbit').hidden=!m;canvas.style.cursor=m?'grab':'crosshair';}
+  function setMode(m){if((mode===3)!==(m===3))selection=0;mode=m;document.querySelectorAll('[data-part]').forEach(b=>{if(+b.dataset.part){const label=m===3?P.parts[b.dataset.part]:D.parts[b.dataset.part];b.hidden=!label;b.textContent=label||'';}});selectionUI();if(reduced)morph=m;document.querySelectorAll('[data-mode]').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.mode===m));document.querySelector('.tag').textContent=['PRIMARY CAMERA · RGB','DEPTH RECONSTRUCTION · RGBD','TEMPORAL · 4D POINT CLOUD','TRACK2ART · PART SEG + AXIS'][m];document.querySelector('.hint').textContent=m?'Drag to orbit · Click to select a part':'Click a part to view CoTracker tracks';document.querySelector('#orbit').hidden=!m;canvas.style.cursor=m?'grab':'crosshair';}
   setMode(0);
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(+b.dataset.mode));
   document.querySelectorAll('[data-part]').forEach(b=>b.onclick=()=>select(+b.dataset.part));
   document.querySelector('#flow').onclick=e=>{flow=!flow;e.currentTarget.textContent=`Point flow · ${flow?'ON':'OFF'}`;e.currentTarget.setAttribute('aria-pressed',flow);selectionUI();};
-  function playUI(){document.querySelector('#play').textContent=playing?'Ⅱ':'▶';document.querySelector('#play').setAttribute('aria-label',playing?'暂停':'播放');}
+  function playUI(){document.querySelector('#play').textContent=playing?'Ⅱ':'▶';document.querySelector('#play').setAttribute('aria-label',playing?'Pause':'Play');}
   document.querySelector('#play').onclick=()=>{if(ready){playing=!playing;playUI();}};
   slider.oninput=()=>{frame=+slider.value;elapsed=0;};
   document.querySelector('#home').onclick=()=>{yaw=pitch=0;};
@@ -52,5 +52,5 @@
     slider.value=frame;output.textContent=`${frames[frame].time.toFixed(2)} s · ${frame+1} / ${N}`;
   }
   requestAnimationFrame(draw);
-  Promise.all(frames.map((f,i)=>new Promise((resolve,reject)=>{const img=new Image();imgs[i]=img;img.onload=resolve;img.onerror=()=>reject(new Error(f.rgb));img.src=f.rgb;}))).then(()=>{ready=true;playing=!reduced;playUI();selectionUI();}).catch(e=>{detail.textContent=`图像加载失败：${e.message}`;detail.classList.add('error');});
+  Promise.all(frames.map((f,i)=>new Promise((resolve,reject)=>{const img=new Image();imgs[i]=img;img.onload=resolve;img.onerror=()=>reject(new Error(f.rgb));img.src=f.rgb;}))).then(()=>{ready=true;playing=!reduced;playUI();selectionUI();}).catch(e=>{detail.textContent=`Image failed to load: ${e.message}`;detail.classList.add('error');});
 })();
