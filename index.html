@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Track2Art recovers articulated object parts, kinematic graphs, joint types, and joint geometry directly from RGB-D interaction videos.">
+  <meta name="theme-color" content="#08100f">
+  <title>Track2Art — Motion-Centric Articulated Object Model Recovery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero" id="top">
+    <video class="hero-video" autoplay muted loop playsinline poster="visualizer/assets/real/scene32/rgb-130.webp" aria-label="Real RGB-D oven interaction with Track2Art part and joint predictions">
+      <source src="assets/hero-track2art.mp4" type="video/mp4">
+    </video>
+    <div class="hero-scrim"></div>
+    <nav class="nav wrap" aria-label="Primary navigation">
+      <a class="brand" href="#top"><span class="brand-mark">T2A</span><span>Track2Art</span></a>
+      <div class="nav-links">
+        <a href="#method">Method</a><a href="#explorer">Explorer</a><a href="#results">Results</a><a href="#citation">Citation</a>
+      </div>
+    </nav>
+    <div class="hero-content wrap">
+      <div class="eyebrow"><span class="pulse"></span> Motion-first articulated perception</div>
+      <h1>Track motion.<br><span>Recover articulation.</span></h1>
+      <p class="dek">Motion-Centric Articulated Object Model Recovery from 2D Point Trackers</p>
+      <p class="authors">Xiaotong Li · Yixiong Jing · Guangming Wang · Brian Sheil</p>
+      <p class="affiliation">University of Cambridge</p>
+      <div class="hero-actions">
+        <a class="button primary" href="assets/track2art-paper.pdf">Read the paper <span>↗</span></a>
+        <a class="button" href="#explorer">Open interactive demo <span>↓</span></a>
+      </div>
+    </div>
+    <div class="hero-legend" aria-label="Visualization legend">
+      <span><i class="dot mint"></i> Part A</span><span><i class="dot coral"></i> Part B</span><span><i class="axis"></i> Predicted axis</span>
+    </div>
+    <a class="scroll-cue" href="#abstract" aria-label="Scroll to abstract">Scroll <span>↓</span></a>
+  </header>
+
+  <main>
+    <section class="section intro" id="abstract">
+      <div class="wrap narrow reveal">
+        <p class="kicker">The idea</p>
+        <h2>Articulation is written in motion.</h2>
+        <p class="lead">Points on the same rigid part move coherently. Relative trajectories between parts expose the constraints that connect them.</p>
+        <div class="abstract-grid">
+          <h3>Abstract</h3>
+          <div>
+            <p>Understanding articulated objects is fundamental for robots to interact with the physical world, requiring accurate segmentation of object parts and their kinematic relations. Existing reconstruction-first approaches can underuse temporal evidence and couple articulation estimation to errors in geometry reconstruction and correspondence.</p>
+            <p>Track2Art is a motion-centric framework that recovers structured articulated object models from RGB-D interaction videos. A pretrained point tracker supplies feature-rich 4D trajectories; a motion-aware slot model groups them into rigid parts; pairwise and rotation-equivariant geometry modules recover the directed kinematic graph, joint types, and joint geometry.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section overview" id="method">
+      <div class="wrap reveal">
+        <div class="section-heading">
+          <div><p class="kicker">Overview</p><h2>From pixels to a structured object model</h2></div>
+          <p>Persistent point motion stays intact from observation to articulation reasoning.</p>
+        </div>
+        <figure class="figure-card">
+          <img src="figures/overview.webp" alt="Track2Art overview: RGB-D video becomes point trajectories, part discovery, and joint prediction">
+          <figcaption>Track2Art transforms an RGB-D interaction into persistent 4D point trajectories, groups coherent motion into parts, and predicts the kinematic structure and joint geometry.</figcaption>
+        </figure>
+        <div class="steps">
+          <article><span>01</span><h3>Track</h3><p>CoTracker establishes persistent 2D correspondences, which calibrated depth lifts into metric 4D trajectories.</p></article>
+          <article><span>02</span><h3>Discover</h3><p>A motion-aware set predictor groups appearance and trajectory geometry into a variable number of rigid parts.</p></article>
+          <article><span>03</span><h3>Articulate</h3><p>Pairwise relation and equivariant geometry heads recover directed joints, types, axes, and pivot points.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pipeline">
+      <div class="wrap reveal">
+        <p class="kicker">Architecture</p>
+        <h2>Motion remains the primary signal.</h2>
+        <figure class="figure-card light">
+          <img src="figures/pipeline.webp" alt="Detailed Track2Art architecture with track tokens, motion-aware part discovery, and joint prediction">
+          <figcaption>Appearance descriptors and explicit trajectory geometry form each track token. The network discovers parts, reasons over ordered slot pairs, and refines physically meaningful joint geometry.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section explorer-section" id="explorer">
+      <div class="wrap reveal">
+        <div class="section-heading">
+          <div><p class="kicker">Interactive explorer</p><h2>Inspect the prediction in motion.</h2></div>
+          <p>Switch between RGB, calibrated RGB-D, temporal 4D point cloud, and Track2Art output. Select a part to reveal its CoTracker flow.</p>
+        </div>
+        <div class="dataset-tabs" role="tablist" aria-label="Real capture sequence">
+          <button class="dataset-tab active" data-scene="scene32">Oven</button>
+          <button class="dataset-tab" data-scene="scene30">Box</button>
+          <button class="dataset-tab" data-scene="scene31">Refrigerator</button>
+          <button class="dataset-tab" data-scene="drawer_hand2">Drawer</button>
+        </div>
+        <div class="explorer-shell">
+          <div class="browser-bar"><i></i><i></i><i></i><span>Track2Art / real capture</span><a href="visualizer/index.html?id=scene32" target="_blank" rel="noopener">Open full screen ↗</a></div>
+          <iframe id="visualizer" src="visualizer/index.html?id=scene32" title="Interactive Track2Art visualizer" loading="lazy"></iframe>
+        </div>
+        <p class="interaction-note"><span>Drag</span> rotate · <span>Control + drag</span> pan · <span>Scroll</span> zoom · click a part to highlight</p>
+      </div>
+    </section>
+
+    <section class="section results" id="results">
+      <div class="wrap reveal">
+        <div class="section-heading">
+          <div><p class="kicker">What it recovers</p><h2>One pass. A complete articulation model.</h2></div>
+        </div>
+        <div class="result-grid">
+          <article><div class="result-icon parts-icon"><i></i><i></i><i></i></div><h3>Rigid part decomposition</h3><p>A variable number of motion-consistent object parts, without supplying the part count at inference.</p></article>
+          <article><div class="result-icon graph-icon"><i></i><i></i><i></i></div><h3>Directed kinematic graph</h3><p>Parent-child connectivity and joint type for every active ordered part pair.</p></article>
+          <article><div class="result-icon axis-icon"><i></i></div><h3>Joint geometry</h3><p>Rotation-equivariant axes and constrained pivot estimates in metric 3D coordinates.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section citation" id="citation">
+      <div class="wrap narrow reveal">
+        <p class="kicker">Paper</p>
+        <div class="citation-heading"><h2>Cite Track2Art</h2><button id="copy-citation">Copy BibTeX</button></div>
+        <pre><code id="bibtex">@article{li_track2art,
+  title   = {Track2Art: Motion-Centric Articulated Object Model Recovery from 2D Point Trackers},
+  author  = {Li, Xiaotong and Jing, Yixiong and Wang, Guangming and Sheil, Brian},
+  journal = {Preprint}
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner"><div><strong>Track2Art</strong><span>University of Cambridge</span></div><a href="#top">Back to top ↑</a></div>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

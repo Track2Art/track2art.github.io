@@ -1,0 +1,12 @@
+{
+  "id": "drawer_hand2",
+  "frames": 178,
+  "fps": 30.0,
+  "parts": 2,
+  "predictedParts": 3,
+  "axes": 2,
+  "displayTracks": 80,
+  "pointStride": 4,
+  "primaryView": 1,
+  "trackReprojectionMedianPx": 0.35196831463727074
+}

@@ -1,0 +1,12 @@
+{
+  "id": "scene30",
+  "frames": 66,
+  "fps": 15.0,
+  "parts": 2,
+  "predictedParts": 2,
+  "axes": 1,
+  "displayTracks": 80,
+  "pointStride": 3,
+  "primaryView": 0,
+  "trackReprojectionMedianPx": 0.39223665835516747
+}
