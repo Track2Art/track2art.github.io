@@ -4,7 +4,7 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont
 
 
-SOURCE = Path("/Users/lxt/Documents/New project/project/part-window/dist/assets/real/scene32")
+SOURCE = Path("/Users/lxt/Documents/New project/project/part-window/dist/assets/real/scene30")
 OUT = Path("assets/hero-frames")
 COLORS = {1: (91, 231, 204), 2: (255, 145, 79), 7: (91, 231, 204)}
 
@@ -48,6 +48,8 @@ def project(p, intr, crop):
 scene = load_js("scene.js")
 pred = load_js("prediction.js")
 OUT.mkdir(parents=True, exist_ok=True)
+for old_frame in OUT.glob("frame-*.jpg"):
+    old_frame.unlink()
 crop = scene["crop"]
 axis = pred["axes"][0]
 pivot = axis["pivot"]
