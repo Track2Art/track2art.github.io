@@ -1,0 +1,41 @@
+.dataset-picker {
+  margin-bottom: 16px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.dataset-picker .dataset-tabs,
+.object-tabs {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+}
+
+.dataset-picker .dataset-tabs {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.dataset-picker .dataset-tab,
+.object-tab {
+  white-space: nowrap;
+}
+
+.object-tab {
+  padding: 9px 17px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: transparent;
+  color: #aec0bb;
+  font: 500 13px var(--body);
+  cursor: pointer;
+}
+
+.object-tab.active {
+  border-color: var(--mint);
+  background: rgba(97, 227, 196, 0.08);
+  color: var(--mint);
+}

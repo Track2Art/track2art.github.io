@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Manrope:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="gallery.css">
 </head>
 <body>
   <header class="hero" id="top">
@@ -67,12 +68,13 @@
     <section class="section explorer-section" id="explorer">
       <div class="wrap reveal">
         <div class="center-heading"><h2>Interactive Demo</h2><p>Switch between RGB, calibrated RGB-D, temporal 4D point cloud, and Track2Art output. Select a part to reveal its CoTracker flow.</p></div>
-        <div class="dataset-tabs" role="tablist" aria-label="Simulation and real sequences">
-          <button class="dataset-tab active" data-kind="real" data-label="Real capture · Box" data-url="visualizer/index.html?id=scene30&amp;build=20260916c">Real · Box</button>
-          <button class="dataset-tab" data-kind="real" data-label="Real capture · Oven" data-url="visualizer/index.html?id=scene32&amp;build=20260916c">Real · Oven</button>
-          <button class="dataset-tab" data-kind="real" data-label="Real capture · Drawer" data-url="visualizer/index.html?id=drawer_hand2&amp;build=20260916c">Real · Drawer</button>
-          <button class="dataset-tab" data-kind="simulation" data-label="Simulation · Oven" data-url="visualizer/partnet.html?id=102018&amp;build=20260916c">Sim · Oven</button>
-          <button class="dataset-tab" data-kind="simulation" data-label="Simulation · Refrigerator" data-url="visualizer/partnet.html?id=10620&amp;build=20260916c">Sim · Refrigerator</button>
+        <div class="dataset-picker">
+          <div class="dataset-tabs" role="tablist" aria-label="Dataset type">
+            <button class="dataset-tab active" data-dataset="real">Real</button>
+            <button class="dataset-tab" data-dataset="partnet">PartNet</button>
+            <button class="dataset-tab" data-dataset="lightwheel">LightWheel</button>
+          </div>
+          <div class="object-tabs" role="tablist" aria-label="Object sequence"></div>
         </div>
         <div class="explorer-shell">
           <div class="browser-bar"><i></i><i></i><i></i><span>Track2Art / Real capture · Box</span><a href="visualizer/index.html?id=scene30&amp;build=20260916c" target="_blank" rel="noopener">Open full screen ↗</a></div>
