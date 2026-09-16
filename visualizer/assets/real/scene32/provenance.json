@@ -1,12 +1,12 @@
 {
   "id": "scene32",
-  "frames": 291,
+  "frames": 72,
   "fps": 30.0,
   "parts": 2,
-  "predictedParts": 2,
-  "axes": 1,
+  "predictedParts": 3,
+  "axes": 2,
   "displayTracks": 80,
   "pointStride": 4,
   "primaryView": 1,
-  "trackReprojectionMedianPx": 0.3730302739568619
+  "trackReprojectionMedianPx": 0.373812713225675
 }

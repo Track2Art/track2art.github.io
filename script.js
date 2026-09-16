@@ -9,9 +9,10 @@ document.querySelectorAll('.dataset-tab').forEach(button => {
   button.addEventListener('click', () => {
     document.querySelectorAll('.dataset-tab').forEach(tab => tab.classList.remove('active'));
     button.classList.add('active');
-    const url = `visualizer/index.html?id=${encodeURIComponent(button.dataset.scene)}`;
+    const url = button.dataset.url;
     frame.src = url;
     fullScreenLink.href = url;
+    document.querySelector('.browser-bar span').textContent = `Track2Art / ${button.dataset.label}`;
   });
 });
 

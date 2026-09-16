@@ -10,7 +10,7 @@
   document.querySelector('header .sub').textContent=`${D.name} · ${D.fps.toFixed(1)} FPS · Recorded RGB-D`;
   document.querySelector('#part-buttons').innerHTML=Array.from({length:maxPart},(_,i)=>`<button data-part="${i+1}" aria-pressed="false"></button>`).join('');
   let yaw=0,pitch=0,viewYaw=0,viewPitch=0,drag=null,hits=[],cached=-1,mask=null,dim=Array(maxPart+1).fill(1);const contextAlpha=window.TRACK2ART_VIEWER_CONFIG?.contextAlpha??.52;
-  const imgs=[], surfaces=partIds.map(()=>document.createElement('canvas'));
+  const imgs=[], imagePromises=[], surfaces=partIds.map(()=>document.createElement('canvas'));
   surfaces.forEach(c=>{c.width=cw;c.height=ch;});
   const tracks=D.tracks, frames=D.frames;
   slider.max=N-1;
@@ -23,7 +23,7 @@
   document.querySelector('#flow').onclick=e=>{flow=!flow;e.currentTarget.textContent=`Point flow · ${flow?'ON':'OFF'}`;e.currentTarget.setAttribute('aria-pressed',flow);selectionUI();};
   function playUI(){document.querySelector('#play').textContent=playing?'Ⅱ':'▶';document.querySelector('#play').setAttribute('aria-label',playing?'Pause':'Play');}
   document.querySelector('#play').onclick=()=>{if(ready){playing=!playing;playUI();}};
-  slider.oninput=()=>{frame=+slider.value;elapsed=0;};
+  slider.oninput=()=>{const next=+slider.value;playing=false;playUI();loadImage(next).then(()=>{frame=next;cached=-1;});elapsed=0;};
   document.querySelector('#home').onclick=()=>{yaw=pitch=0;};
   document.querySelectorAll('[data-orbit]').forEach(b=>b.onclick=()=>{const d=b.dataset.orbit;yaw+=d==='left'?.15:d==='right'?-.15:0;pitch=Math.max(-1,Math.min(1,pitch+(d==='up'?.12:d==='down'?-.12:0)));});
   new ResizeObserver(()=>{W=canvas.clientWidth;H=canvas.clientHeight;const d=Math.min(devicePixelRatio||1,2);canvas.width=W*d;canvas.height=H*d;ctx.setTransform(d,0,0,d,0,0);}).observe(canvas);
@@ -34,9 +34,10 @@
   canvas.onpointermove=e=>{if(!drag||drag.id!==e.pointerId)return;if(Math.hypot(e.clientX-drag.x,e.clientY-drag.y)>5)drag.moved=true;if(mode&&drag.moved){yaw-=(e.clientX-drag.lx)*.006;pitch=Math.max(-1,Math.min(1,pitch-(e.clientY-drag.ly)*.005));canvas.style.cursor='grabbing';}drag.lx=e.clientX;drag.ly=e.clientY;};
   canvas.onpointerup=e=>{if(!drag||drag.id!==e.pointerId)return;if(!drag.moved){const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;let part=0;if(morph<.15)part=maskAt(x,y);else{let best=100;for(const p of hits){const distance=(p[0]-x)**2+(p[1]-y)**2;if(distance<best){best=distance;part=p[3];}}}select(part===selection?0:part);}drag=null;canvas.style.cursor=mode?'grab':'crosshair';};
   canvas.onpointercancel=()=>{drag=null;canvas.style.cursor=mode?'grab':'crosshair';};
-  function prepareFrame(){if(cached===frame)return;cached=frame;mask=new Uint8Array(cw*ch);const runs=frames[frame].mask;let offset=0;for(let i=0;i<runs.length;i+=2){mask.fill(runs[i],offset,offset+runs[i+1]);offset+=runs[i+1];}surfaces.forEach((c,j)=>{const s=c.getContext('2d');s.clearRect(0,0,cw,ch);s.drawImage(imgs[frame],0,0);const pixels=s.getImageData(0,0,cw,ch);for(let i=0;i<mask.length;i++)pixels.data[i*4+3]=mask[i]===j+1?255:0;s.putImageData(pixels,0,0);});}
+  function loadImage(i){if(imagePromises[i])return imagePromises[i];imagePromises[i]=new Promise((resolve,reject)=>{const img=new Image();imgs[i]=img;img.onload=resolve;img.onerror=()=>reject(new Error(frames[i].rgb));img.src=frames[i].rgb;});return imagePromises[i];}
+  function prepareFrame(){if(cached===frame||!imgs[frame]?.complete)return;cached=frame;mask=new Uint8Array(cw*ch);const runs=frames[frame].mask;let offset=0;for(let i=0;i<runs.length;i+=2){mask.fill(runs[i],offset,offset+runs[i+1]);offset+=runs[i+1];}surfaces.forEach((c,j)=>{const s=c.getContext('2d');s.clearRect(0,0,cw,ch);s.drawImage(imgs[frame],0,0);const pixels=s.getImageData(0,0,cw,ch);for(let i=0;i<mask.length;i++)pixels.data[i*4+3]=mask[i]===j+1?255:0;s.putImageData(pixels,0,0);});}
   function draw(now){if(!canvas.isConnected)return;const dt=Math.min((now-last)/1000||0,.05);last=now;requestAnimationFrame(draw);if(!ready)return;
-    if(playing){elapsed+=dt*D.fps;if(elapsed>=1){frame=(frame+Math.floor(elapsed))%N;elapsed%=1;}}
+    if(playing){elapsed+=dt*D.fps;if(elapsed>=1){const next=(frame+Math.floor(elapsed))%N;loadImage(next).then(()=>{frame=next;cached=-1;});elapsed%=1;}}
     const ease=reduced?1:1-Math.exp(-dt*9);morph+=(mode-morph)*ease;viewYaw+=(yaw-viewYaw)*ease;viewPitch+=(pitch-viewPitch)*ease;
     dim=dim.map((v,i)=>v+((!selection||selection===i?1:contextAlpha)-v)*ease);prepareFrame();
     ctx.clearRect(0,0,W,H);const l=layout(),spatial=Math.min(1,morph),fusion=0;
@@ -52,5 +53,5 @@
     slider.value=frame;output.textContent=`${frames[frame].time.toFixed(2)} s · ${frame+1} / ${N}`;
   }
   requestAnimationFrame(draw);
-  Promise.all(frames.map((f,i)=>new Promise((resolve,reject)=>{const img=new Image();imgs[i]=img;img.onload=resolve;img.onerror=()=>reject(new Error(f.rgb));img.src=f.rgb;}))).then(()=>{ready=true;playing=!reduced;playUI();selectionUI();}).catch(e=>{detail.textContent=`Image failed to load: ${e.message}`;detail.classList.add('error');});
+  loadImage(0).then(()=>{ready=true;playing=!reduced;playUI();selectionUI();const prefetch=()=>frames.forEach((_,i)=>loadImage(i).catch(()=>{}));window.requestIdleCallback?window.requestIdleCallback(prefetch):setTimeout(prefetch,250);}).catch(e=>{detail.textContent=`Image failed to load: ${e.message}`;detail.classList.add('error');});
 })();
