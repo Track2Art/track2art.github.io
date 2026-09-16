@@ -4,7 +4,7 @@
   "fps": 30.0,
   "parts": 2,
   "predictedParts": 8,
-  "axes": 7,
+  "axes": 0,
   "displayTracks": 80,
   "pointStride": 4,
   "primaryView": 1,
