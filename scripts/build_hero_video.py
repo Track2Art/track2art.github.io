@@ -48,7 +48,7 @@ def main():
             repeats = 1 if index < 10 or index > 38 else (2 if index % 4 else 3)
             for _ in range(repeats):
                 shutil.copy2(rendered / f"frame-{index:03}.jpg", timeline / f"frame-{output_index:04}.jpg"); output_index += 1
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", str(timeline / "frame-%04d.jpg"), "-vf", "crop=700:394:0:86,scale=1280:720:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(ROOT / "assets/hero-track2art.mp4")], check=True)
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", str(timeline / "frame-%04d.jpg"), "-vf", "crop=676:380:0:100,scale=1280:720:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(ROOT / "assets/hero-track2art.mp4")], check=True)
         print(f"Rendered {output_index} frames ({output_index / 30:.2f}s)")
 
 if __name__ == "__main__": main()
