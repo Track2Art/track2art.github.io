@@ -93,10 +93,13 @@
   }
   function setMode(m) {
     if ((mode === 3) !== (m === 3)) selection = 0;
-    // Every view starts from the calibrated primary-camera projection so
-    // point-cloud and prediction geometry align with the RGB frame.
-    yaw = pitch = viewYaw = viewPitch = panX = panY = 0;
-    zoom = 1;
+    const crossesRgbBoundary = (mode === 0) !== (m === 0);
+    if (crossesRgbBoundary) {
+      // Enter and leave 3D from the calibrated primary-camera projection.
+      // Preserve the camera when switching between the two 3D renderings.
+      yaw = pitch = viewYaw = viewPitch = panX = panY = 0;
+      zoom = 1;
+    }
     mode = m;
     morph = m;
     document.querySelectorAll("[data-part]").forEach((b) => {
