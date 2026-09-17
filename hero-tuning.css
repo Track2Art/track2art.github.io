@@ -1,3 +1,5 @@
 .hero-video {
-  object-position: center 44%;
+  object-position: 46% 52%;
+  transform: scale(1.18) translate(2%, -7%);
+  transform-origin: 46% 52%;
 }

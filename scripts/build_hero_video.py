@@ -1,7 +1,7 @@
 """Render the oven hero with Track2Art overlays and a slow-motion opening segment."""
 import json, shutil, subprocess, tempfile
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "visualizer/assets/real/scene32"
@@ -35,9 +35,6 @@ def render_frame(scene, prediction, index, output):
         draw.line(endpoints, fill="#ffdd68ee", width=4)
         x, y = pivot_2d
         draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill="#fff0a8ff", outline="#17201fff", width=2)
-        tx, ty = max(12, min(image.width - 180, x + 12)), max(18, min(image.height - 34, y - 25))
-        draw.rounded_rectangle((tx - 6, ty - 4, tx + 170, ty + 19), radius=5, fill="#091311c9", outline="#ffdd6899")
-        draw.text((tx, ty), f"REVOLUTE AXIS  {axis['confidence']:.2f}", fill="#fff5cfff", font=ImageFont.load_default())
     image.save(output, quality=91)
 
 def main():
@@ -48,10 +45,10 @@ def main():
         for index in range(len(scene["frames"])): render_frame(scene, prediction, index, rendered / f"frame-{index:03}.jpg")
         output_index = 0
         for index in range(len(scene["frames"])):
-            repeats = 1 if index < 20 or index > 55 else (2 if index % 4 else 3)
+            repeats = 1 if index < 10 or index > 38 else (2 if index % 4 else 3)
             for _ in range(repeats):
                 shutil.copy2(rendered / f"frame-{index:03}.jpg", timeline / f"frame-{output_index:04}.jpg"); output_index += 1
-        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", str(timeline / "frame-%04d.jpg"), "-vf", "crop=518:291:0:18,scale=1280:720:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(ROOT / "assets/hero-track2art.mp4")], check=True)
+        subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-framerate", "30", "-i", str(timeline / "frame-%04d.jpg"), "-vf", "crop=848:477:0:1,scale=1280:720:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(ROOT / "assets/hero-track2art.mp4")], check=True)
         print(f"Rendered {output_index} frames ({output_index / 30:.2f}s)")
 
 if __name__ == "__main__": main()

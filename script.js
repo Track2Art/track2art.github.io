@@ -26,7 +26,7 @@ const fullScreenLink = document.querySelector('.browser-bar a');
 const gallery = {
   real: [
     { name: 'Box', label: 'Real capture · Box', url: 'visualizer/index.html?id=scene30&build=20260916d' },
-    { name: 'Oven', label: 'Real capture · Oven', url: 'visualizer/index.html?id=scene32&build=20260916d' },
+    { name: 'Oven', label: 'Real capture · Oven', url: 'visualizer/index.html?id=scene32&build=20260917a' },
   ],
   partnet: [
     { name: 'Oven 102018', label: 'PartNet · Oven 102018', url: 'visualizer/partnet.html?id=102018&build=20260916d' },
