@@ -15,8 +15,8 @@ const gallery = {
     { name: 'Refrigerator 10620', label: 'PartNet · Refrigerator 10620', url: 'visualizer/partnet.html?id=10620&build=20260916d' },
   ],
   lightwheel: [
-    { name: 'Microwave 053', label: 'LightWheel · Microwave 053', url: 'visualizer/lightwheel/microwave053.html' },
-    { name: 'Refrigerator 038', label: 'LightWheel · Refrigerator 038', url: 'visualizer/lightwheel/refrigerator038.html' },
+    { name: 'Microwave 053', label: 'LightWheel · Microwave 053', url: 'visualizer/lightwheel.html?id=microwave053&build=20260917a' },
+    { name: 'Refrigerator 038', label: 'LightWheel · Refrigerator 038', url: 'visualizer/lightwheel.html?id=refrigerator038&build=20260917a' },
   ],
 };
 const objectTabs = document.querySelector('.object-tabs');

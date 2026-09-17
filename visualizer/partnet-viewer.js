@@ -1,12 +1,12 @@
 (()=>{
   const D=window.PARTNET_OBJECT,c=document.querySelector('canvas'),g=c.getContext('2d');
   const slider=document.querySelector('#time'),out=document.querySelector('output'),legend=document.querySelector('.legend'),tag=document.querySelector('.tag'),hint=document.querySelector('.hint'),home=document.querySelector('#home');
-  let W=900,H=560,f=0,last=0,playing=true,viewRot=[1,0,0,0,1,0,0,0,1],orbitTravel=0,panX=0,panY=0,zoom=1,drag=null,selected=0,mode=0,morph=0,hits=[],ready=false;
+  let W=900,H=560,f=0,last=0,playing=true,viewRot=[1,0,0,0,1,0,0,0,1],orbitTravel=0,panX=0,panY=0,zoom=D.initialZoom||1,drag=null,selected=0,mode=0,morph=0,hits=[],ready=false;
   const palette=['#7e8b9d','#55c7ff','#ffad5c','#64dfac','#eb82bd','#b79cff','#f4d563','#66c7c0'],images=[],imagePromises=[],rotation=D.displayRotation||0,contextAlpha=window.TRACK2ART_VIEWER_CONFIG?.contextAlpha??.52;
   const viewKey=`track2art:view:depth-reversed-v1:${D.id}`;
   try{const saved=JSON.parse(sessionStorage.getItem(viewKey));if(saved&&saved.viewRot?.length===9){viewRot=saved.viewRot;orbitTravel=saved.orbitTravel||0;panX=saved.panX||0;panY=saved.panY||0;zoom=saved.zoom||1}}catch{}
   function saveView(){try{sessionStorage.setItem(viewKey,JSON.stringify({viewRot,orbitTravel,panX,panY,zoom}))}catch{}}
-  function resetView(){viewRot=[1,0,0,0,1,0,0,0,1];orbitTravel=0;panX=0;panY=0;zoom=1;saveView()}
+  function resetView(){viewRot=[1,0,0,0,1,0,0,0,1];orbitTravel=0;panX=0;panY=0;zoom=D.initialZoom||1;saveView()}
   document.querySelector('.name').textContent=D.id.replace('_',' · ');
   document.querySelector('.meta').textContent=`${D.frames.length} frames · ${D.fps.toFixed(1)} FPS · ${D.parts.length} predicted parts · ${D.axes.length} joints`;
   slider.max=D.frames.length-1;
