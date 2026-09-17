@@ -19,10 +19,8 @@
         color-scheme: dark;
       }
       main {
-        max-width: 1060px;
-        margin: 32px auto;
-        border: 1px solid #2a3543;
-        border-radius: 18px;
+        width: 100%;
+        margin: 0;
         overflow: hidden;
         background: #121924;
       }
@@ -199,7 +197,7 @@
               ><a href="partnet.html?id=102018">PartNet-Mobility</a></span
             ><span class="object-nav"
               ><a data-object="scene30" href="index.html?id=scene30">Box</a
-              ><a data-object="scene32" href="index.html?id=scene32"
+              ><a data-object="scene32-mv" href="index.html?id=scene32-mv"
                 >Oven</a
               ></span
             >
@@ -245,12 +243,6 @@
         /><output>Reading data…</output>
       </div>
       <div class="detail" aria-live="polite">Loading captured sequence…</div>
-      <div class="footer">
-        RGB: calibrated primary-view frame · 4D: temporal primary-view point
-        cloud · Parts: predicted Track2Art slots · Tracks: CoTracker 3<br />Measured
-        depth preserves holes and occlusions; no multi-camera fusion or surface
-        completion.
-      </div>
     </main>
     <script src="viewer-config.js?v=1"></script>
     <script>

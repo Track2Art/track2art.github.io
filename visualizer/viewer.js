@@ -35,8 +35,9 @@
       .map(Number)
       .sort((a, b) => a - b),
     maxPart = Math.max(0, ...partIds, ...predPartIds);
-  const displayParts =
-    realId === "scene30" ? { 1: "Base", 2: "Lid" } : { 1: "Body", 2: "Door" };
+  const displayParts = realId.startsWith("scene30")
+    ? { 1: "Base", 2: "Lid" }
+    : { 1: "Body", 2: "Door" };
   const predictionPart = (part) =>
     realId === "scene30" ? (part === 1 ? 2 : part === 2 ? 1 : part) : part;
   document
@@ -52,6 +53,9 @@
     pitch = 0,
     viewYaw = 0,
     viewPitch = 0,
+    panX = 0,
+    panY = 0,
+    zoom = 1,
     drag = null,
     hits = [],
     cached = -1,
@@ -89,7 +93,12 @@
   }
   function setMode(m) {
     if ((mode === 3) !== (m === 3)) selection = 0;
+    // Every view starts from the calibrated primary-camera projection so
+    // point-cloud and prediction geometry align with the RGB frame.
+    yaw = pitch = viewYaw = viewPitch = panX = panY = 0;
+    zoom = 1;
     mode = m;
+    morph = m;
     document.querySelectorAll("[data-part]").forEach((b) => {
       if (+b.dataset.part) {
         const label = displayParts[b.dataset.part];
@@ -109,7 +118,7 @@
       "TRACK2ART · PART SEG + AXIS",
     ][m];
     document.querySelector(".hint").textContent = m
-      ? "Drag to orbit · Click to select a part"
+      ? "Drag rotate · Ctrl-drag pan · Scroll zoom"
       : "Click a part to view CoTracker tracks";
     document.querySelector("#orbit").hidden = !m;
     canvas.style.cursor = m ? "grab" : "crosshair";
@@ -150,7 +159,8 @@
     elapsed = 0;
   };
   document.querySelector("#home").onclick = () => {
-    yaw = pitch = 0;
+    yaw = pitch = viewYaw = viewPitch = panX = panY = 0;
+    zoom = 1;
   };
   document.querySelectorAll("[data-orbit]").forEach(
     (b) =>
@@ -188,11 +198,11 @@
     x = xx + C[0];
     y = yy + C[1];
     const l = layout();
-    return [
-      l.x + ((K.fx * x) / z + K.cx - cx) * l.scale,
-      l.y + ((-K.fy * y) / z + K.cy - cy) * l.scale,
-      z,
-    ];
+    const screenX = l.x + ((K.fx * x) / z + K.cx - cx) * l.scale;
+    const screenY = l.y + ((-K.fy * y) / z + K.cy - cy) * l.scale;
+    const viewZoom = mode ? zoom : 1;
+    return [W / 2 + (screenX - W / 2) * viewZoom + (mode ? panX : 0),
+            H / 2 + (screenY - H / 2) * viewZoom + (mode ? panY : 0), z];
   }
   function maskAt(x, y) {
     const l = layout(),
@@ -209,6 +219,7 @@
       lx: e.clientX,
       ly: e.clientY,
       moved: false,
+      action: e.ctrlKey ? "pan" : "orbit",
     };
     canvas.setPointerCapture(e.pointerId);
   };
@@ -217,9 +228,15 @@
     if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 5)
       drag.moved = true;
     if (mode && drag.moved) {
-      yaw -= (e.clientX - drag.lx) * 0.006;
-      pitch = Math.max(-1, Math.min(1, pitch - (e.clientY - drag.ly) * 0.005));
-      canvas.style.cursor = "grabbing";
+      if (drag.action === "pan") {
+        panX += e.clientX - drag.lx;
+        panY += e.clientY - drag.ly;
+        canvas.style.cursor = "move";
+      } else {
+        yaw -= (e.clientX - drag.lx) * 0.006;
+        pitch = Math.max(-1, Math.min(1, pitch - (e.clientY - drag.ly) * 0.005));
+        canvas.style.cursor = "grabbing";
+      }
     }
     drag.lx = e.clientX;
     drag.ly = e.clientY;
@@ -251,6 +268,11 @@
     drag = null;
     canvas.style.cursor = mode ? "grab" : "crosshair";
   };
+  canvas.addEventListener("wheel", (event) => {
+    if (!mode) return;
+    event.preventDefault();
+    zoom = Math.max(0.65, Math.min(4, zoom * Math.exp(-event.deltaY * 0.0015)));
+  }, { passive: false });
   function loadImage(i) {
     if (imagePromises[i]) return imagePromises[i];
     imagePromises[i] = new Promise((resolve, reject) => {
@@ -311,7 +333,7 @@
     ctx.clearRect(0, 0, W, H);
     const l = layout(),
       spatial = Math.min(1, morph),
-      fusion = 0;
+      fusion = mode >= 2 ? 1 : 0;
     ctx.globalAlpha = (1 - spatial) * dim[0];
     ctx.drawImage(imgs[frame], l.x, l.y, cw * l.scale, ch * l.scale);
     for (const part of partIds) {
@@ -344,7 +366,7 @@
         points = [];
       for (let i = 0; i < raw.length; i += 8) {
         const view = raw[i + 7];
-        if (view) continue;
+        if (view && !fusion) continue;
         const p = project(raw[i], raw[i + 1], raw[i + 2]);
         if (p[2] <= 0.05) continue;
         const part =
