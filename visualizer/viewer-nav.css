@@ -1,0 +1,27 @@
+.viewer-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 9px;
+}
+
+.viewer-nav span {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid #2a3746;
+  border-radius: 9px;
+}
+
+.viewer-nav a {
+  color: #9eb0c2;
+  padding: 6px 9px;
+  border-radius: 6px;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.viewer-nav a.active {
+  color: #eafff7;
+  background: #304740;
+}
