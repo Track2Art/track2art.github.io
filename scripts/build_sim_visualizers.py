@@ -13,6 +13,18 @@ SOURCE = ROOT / "project/part-window/dist/assets/partnet-rgbd"
 INFERENCE = ROOT / "outputs/paper_experiments/partnet_final_best_visuals_v1/inference"
 OUTPUT = PAGE / "visualizer/assets/partnet-rgbd"
 OBJECTS = ("102018", "10620", "12552", "24931", "10638", "45146")
+AXIS_OVERRIDES = {
+    # The source viewer predates the final joint-type checkpoint.
+    "24931": {
+        "type": "prismatic",
+        "direction": [
+            0.040262629548332436,
+            0.9983021275005218,
+            -0.04209255147630795,
+        ],
+        "confidence": 0.9997931122779846,
+    },
+}
 
 
 def load_js(path):
@@ -59,6 +71,9 @@ def compact_object(object_id):
                 "child": slots.index(edge["child_slot_id"]) + 1,
                 "confidence": confidence,
             })
+    elif object_id in AXIS_OVERRIDES:
+        override = AXIS_OVERRIDES[object_id]
+        data["axes"] = [{**axis, **override} for axis in data["axes"]]
 
     payload = json.dumps(data, separators=(",", ":"), allow_nan=False)
     (out_dir / "data.js").write_text(f"window.PARTNET_OBJECT={payload};\n")
