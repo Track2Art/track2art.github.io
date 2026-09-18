@@ -12,7 +12,7 @@
     "assets/real/scene30/prediction.js?v=7",
     "assets/real/scene32-mv/scene.js?v=7",
     "assets/real/scene32-mv/prediction.js?v=7",
-    ...partnetObjects.map((id) => `assets/partnet-rgbd/${id}/data.js?v=5`),
+    ...partnetObjects.map((id) => `assets/partnet-rgbd/${id}/data.js?v=6`),
     ...frameUrls("assets/real/scene30", 72),
     ...frameUrls("assets/real/scene32-mv", 66),
     ...partnetObjects.flatMap((id) =>
