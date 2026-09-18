@@ -411,8 +411,11 @@
         g.arc(p[0], p[1], 4, 0, Math.PI * 2);
         g.fill();
         g.font = "12px system-ui";
+        const confidence = Number.isFinite(a.confidence)
+          ? ` · conf. ${a.confidence.toFixed(2)}`
+          : "";
         g.fillText(
-          `Pred. ${a.type} axis · conf. ${(a.confidence ?? 0).toFixed(2)}`,
+          `Pred. ${a.type} axis${confidence}`,
           Math.max(12, Math.min(W - 250, p[0] + 10)),
           Math.max(65, Math.min(H - 25, p[1] - 12)),
         );

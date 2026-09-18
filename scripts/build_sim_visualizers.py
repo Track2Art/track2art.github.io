@@ -12,7 +12,7 @@ ROOT = PAGE.parent
 SOURCE = ROOT / "project/part-window/dist/assets/partnet-rgbd"
 INFERENCE = ROOT / "outputs/paper_experiments/partnet_final_best_visuals_v1/inference"
 OUTPUT = PAGE / "visualizer/assets/partnet-rgbd"
-OBJECTS = ("102018", "10620")
+OBJECTS = ("102018", "10620", "12552", "24931", "10638", "45146")
 
 
 def load_js(path):
@@ -22,7 +22,8 @@ def load_js(path):
 
 def compact_object(object_id):
     data = load_js(SOURCE / object_id / "data.js")
-    inference = json.loads((INFERENCE / f"partnet_{object_id}" / "joint_inference.json").read_text())
+    inference_path = INFERENCE / f"partnet_{object_id}" / "joint_inference.json"
+    inference = json.loads(inference_path.read_text()) if inference_path.exists() else None
     old_count = len(data["frames"])
     indices = np.unique(np.linspace(0, old_count - 1, min(72, old_count), dtype=int)).tolist()
 
@@ -42,21 +43,22 @@ def compact_object(object_id):
     data["cameraPoses"] = [data["cameraPoses"][i] for i in indices]
     data["tracks"] = [{**track, "samples": [track["samples"][i] for i in indices]} for track in data["tracks"]]
     data["fps"] *= len(indices) / old_count
-    slots = inference["active_slots"]
-    data["parts"] = list(range(1, len(slots) + 1))
-    data["axes"] = []
-    for edge in inference["selected_edges"]:
-        confidence = float(edge.get("joint_confidence", 0.0))
-        if confidence < .65 or float(edge.get("edge_probability", 0.0)) < .95:
-            continue
-        data["axes"].append({
-            "pivot": edge["axis_line_point_world"],
-            "direction": edge["axis_world"],
-            "type": edge["joint_type"],
-            "parent": slots.index(edge["parent_slot_id"]) + 1,
-            "child": slots.index(edge["child_slot_id"]) + 1,
-            "confidence": confidence,
-        })
+    if inference:
+        slots = inference["active_slots"]
+        data["parts"] = list(range(1, len(slots) + 1))
+        data["axes"] = []
+        for edge in inference["selected_edges"]:
+            confidence = float(edge.get("joint_confidence", 0.0))
+            if confidence < .65 or float(edge.get("edge_probability", 0.0)) < .95:
+                continue
+            data["axes"].append({
+                "pivot": edge["axis_line_point_world"],
+                "direction": edge["axis_world"],
+                "type": edge["joint_type"],
+                "parent": slots.index(edge["parent_slot_id"]) + 1,
+                "child": slots.index(edge["child_slot_id"]) + 1,
+                "confidence": confidence,
+            })
 
     payload = json.dumps(data, separators=(",", ":"), allow_nan=False)
     (out_dir / "data.js").write_text(f"window.PARTNET_OBJECT={payload};\n")

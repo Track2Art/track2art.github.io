@@ -406,8 +406,12 @@
     }
     ctx.globalAlpha = 1;
     if (selection && flow) {
-      for (const tr of mode === 3 || mode === 0 ? P.tracks : tracks) {
-        if (predictionPart(tr.part) !== selection || (tr.view && fusion < 0.3))
+      const usesPredictionTracks = mode === 3 || mode === 0;
+      for (const tr of usesPredictionTracks ? P.tracks : tracks) {
+        const trackPart = usesPredictionTracks
+          ? predictionPart(tr.part)
+          : tr.part;
+        if (trackPart !== selection || (tr.view && fusion < 0.3))
           continue;
         const current = tr.samples[frame];
         if (!current) continue;
